@@ -109,3 +109,8 @@ workflows:
           # Project-level env vars.
           args: --build-arg USER_PASSWORD=$USER_PASS
           context: github
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
