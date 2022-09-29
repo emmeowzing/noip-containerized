@@ -56,7 +56,7 @@ workflows:
   docker:
     jobs:
       - docker-github:
-          name: noip
+          image-name: noip
           commit-tag: true
           # Project-level env vars.
           args: --build-arg USER_PASSWORD=$USER_PASS
