@@ -94,6 +94,10 @@ workflows:
           modules: |
             .
             scripts
+          filters:
+            branches:
+              ignore:
+                - master
 
       - generate-release:
           name: Generate release from tag
