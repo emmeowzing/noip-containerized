@@ -40,6 +40,7 @@ jobs:
             gh release create "$LATEST_TAG" --generate-notes
 
   # Duplicated code from app.yml to get around singular job limitation on continuations.
+  # TODO: move the following to an orb to reduce duplication.
   docker-github:
     resource_class: medium
     executor: docker
@@ -65,6 +66,7 @@ jobs:
         default: .
         type: string
     steps:
+      - checkout
       - run:
           name: Login to ghcr.io
           command: |+

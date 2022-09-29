@@ -33,6 +33,7 @@ jobs:
         default: .
         type: string
     steps:
+      - checkout
       - run:
           name: Login to ghcr.io
           command: |+
