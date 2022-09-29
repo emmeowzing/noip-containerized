@@ -105,7 +105,7 @@ workflows:
               only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 
       - docker-github:
-          image-name: noip
+          image-name: ghcr.io/bjd2385/noip
           tag: $CIRCLE_TAG
           commit-tag: false
           # Project-level env vars.
