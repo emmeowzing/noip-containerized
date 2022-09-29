@@ -8,6 +8,10 @@ executors:
     docker:
       - image: cimg/base:stable
 
+  docker:
+    machine:
+      image: ubuntu-2204:2022.07.1
+
 
 orbs:
   dynamic: bjd2385/dynamic-continuation@3.2.0
@@ -35,6 +39,50 @@ jobs:
             echo "$GITHUB_TOKEN" | gh auth login --with-token 2>/dev/null || true
             gh release create "$LATEST_TAG" --generate-notes
 
+  # Duplicated code from app.yml to get around singular job limitation on continuations.
+  docker-github:
+    resource_class: medium
+    executor: docker
+    parameters:
+      image-name:
+        description: Name of the image.
+        default: ''
+        type: string
+      tag:
+        description: Name of the tag for the image.
+        default: latest
+        type: string
+      commit-tag:
+        description: Whether or not to push an additional tag to the registry with the commit hash as the tag.
+        default: false
+        type: boolean
+      args:
+        description: Additional args string to add to the build command. (E.g., '--build-arg HELLO=WORLD'.)
+        default: ''
+        type: string
+      path:
+        description: Path to the Dockerfile.
+        default: .
+        type: string
+    steps:
+      - run:
+          name: Login to ghcr.io
+          command: |+
+            echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
+      - run:
+          name: Build and push tag
+          command: |+
+            docker build << parameters.path >> -t << parameters.image-name >>:<< parameters.tag >> << parameters.args >>
+            docker push << parameters.image-name >>:<< parameters.tag >>
+      - when:
+          condition: << parameters.commit-tag >>
+          steps:
+            - run:
+                name: Push commit tag
+                command: |+
+                  docker tag << parameters.image-name >>:<< parameters.tag >> << parameters.image-name >>:$CIRCLE_SHA1
+                  docker push << parameters.image-name >>:$CIRCLE_SHA1
+
 
 workflows:
   noip:
@@ -53,3 +101,11 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+
+      - docker-github:
+          name: noip
+          tag: $CIRCLE_TAG
+          commit-tag: false
+          # Project-level env vars.
+          args: --build-arg USER_PASSWORD=$USER_PASS
+          context: github
