@@ -1,4 +1,4 @@
 # Ignore everything except the Dockerfile and everything relevant to it.
 *
 !.Dockerfile
-!scripts/
+!scripts/*

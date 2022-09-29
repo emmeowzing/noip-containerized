@@ -7,4 +7,5 @@ docker run -itd --name noip --restart=unless-stopped \
     -e PASSWORD="$(pass show noip/password)" \
     -e HOSTNAME="$(pass show noip/hostname)" \
     -e INTERVAL=30 \
+    -e DEBUG=true \
     noip:"$VERSION"
